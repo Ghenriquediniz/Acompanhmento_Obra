@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../models/obra_model.dart';
+import '../adm/relatorios/relatorio_list_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../bloc/relatorios/relatorios_bloc.dart';
+import '../../../bloc/relatorios/relatorios_event.dart';
 
 class ObraDetailPage extends StatelessWidget {
   final Obra obra;
@@ -33,9 +37,7 @@ class ObraDetailPage extends StatelessWidget {
                 : const Center(
                   child: Icon(Icons.image_not_supported, size: 100),
                 ),
-
             const SizedBox(height: 20),
-
             // Informações
             Text(
               obra.nome,
@@ -44,24 +46,21 @@ class ObraDetailPage extends StatelessWidget {
             Row(
               children: [
                 Text('Cidade: ${obra.cidade}'),
-                SizedBox(width: 20), // espaço entre os textos
+                const SizedBox(width: 20), // espaço entre os textos
                 Text('Bairro: ${obra.bairro}'),
               ],
             ),
-
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Status: ${obra.status}',
               style: const TextStyle(fontSize: 18),
             ),
-
             const SizedBox(height: 10),
             const Text(
               'Fotos',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 1),
-
             // Galeria
             SizedBox(
               height: 120,
@@ -86,53 +85,48 @@ class ObraDetailPage extends StatelessWidget {
                 },
               ),
             ),
-            SizedBox(
-              height: 120,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: galeriaExemplo.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  final path = galeriaExemplo[index];
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(1),
-                    child:
-                        path != null
-                            ? Image.file(
-                              File(path),
-                              width: 200,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            )
-                            : const Icon(Icons.image_not_supported, size: 80),
-                  );
-                },
-              ),
-            ),
-            SizedBox(
-              height: 120,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: galeriaExemplo.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  final path = galeriaExemplo[index];
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(1),
-                    child:
-                        path != null
-                            ? Image.file(
-                              File(path),
-                              width: 200,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            )
-                            : const Icon(Icons.image_not_supported, size: 80),
-                  );
-                },
-              ),
-            ),
+            const SizedBox(height: 120),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 8,
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.dashboard, color: Colors.grey),
+                  SizedBox(height: 4),
+                  Text('Visão geral', style: TextStyle(fontSize: 12)),
+                ],
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => BlocProvider(
+                            create:
+                                (_) =>
+                                    RelatorioBloc()
+                                      ..add(CarregarRelatorios(obra.id)),
+                            child: RelatorioListPage(obraId: obra.id),
+                          ),
+                    ),
+                  );
+                },
+                child: Column(
+                  children: const [Icon(Icons.assignment), Text('Relatórios')],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

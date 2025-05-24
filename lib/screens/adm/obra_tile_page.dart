@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../models/obra_model.dart';
 import 'editar_obra_page.dart';
-import '../shared/obra_detail_page.dart';
+import 'adm_obra_detail_page.dart';
 
 class ObraTile extends StatelessWidget {
   final Obra obra;
@@ -38,7 +38,7 @@ class ObraTile extends StatelessWidget {
           },
         ),
 
-        // opcional: clique no tile abre detalhes
+        // tile abre detalhes
         onTap: () {
           Navigator.push(
             context,
