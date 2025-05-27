@@ -5,6 +5,7 @@ import '../../../bloc/relatorios/relatorios_state.dart';
 import '../../../bloc/relatorios/relatorios_event.dart';
 import 'relatorio_detail_page.dart';
 import 'relatorio_form_page.dart';
+import './relatorio_editar_page.dart';
 
 class RelatorioListPage extends StatefulWidget {
   final String obraId;
@@ -25,58 +26,71 @@ class _RelatorioListPageState extends State<RelatorioListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Relatórios da Obra')),
+      appBar: AppBar(title: const Text('Relatórios')),
       body: BlocBuilder<RelatorioBloc, RelatorioState>(
         builder: (context, state) {
           if (state is RelatorioCarregando) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is RelatorioCarregado) {
-            final relatorios =
-                state.relatorios
-                    .where((r) => r.obraId == widget.obraId)
-                    .toList();
-
-            if (relatorios.isEmpty) {
+            if (state.relatorios.isEmpty) {
               return const Center(child: Text('Nenhum relatório cadastrado.'));
             }
 
             return ListView.builder(
-              itemCount: relatorios.length,
-              itemBuilder: (context, index) {
-                final relatorio = relatorios[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+              itemCount: state.relatorios.length,
+              itemBuilder: (_, i) {
+                final r = state.relatorios[i];
+                return ListTile(
+                  title: Text(
+                    'Relatório ${r.relatorioN}',
+                  ), // Número do relatório
+                  subtitle: Text(
+                    '${r.data.day}/${r.data.month}/${r.data.year}',
                   ),
-                  child: ListTile(
-                    leading: const Icon(Icons.description),
-                    title: Text('Relatório ${relatorio.id}'),
-                    subtitle: Text(
-                      'Data: ${relatorio.data.day}/${relatorio.data.month}/${relatorio.data.year}',
-                    ),
-                    trailing: const Icon(Icons.arrow_forward),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) => RelatorioDetailPage(relatorio: relatorio),
-                        ),
-                      );
-                    },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit,
+                          color: Colors.blue,
+                        ), // Ícone de lápis
+                        tooltip: 'Editar Relatório',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => BlocProvider.value(
+                                    value: context.read<RelatorioBloc>(),
+                                    child: EditarRelatorioPage(relatorio: r),
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                      const Icon(
+                        Icons.chevron_right,
+                      ), // Ícone de seta para detalhes
+                    ],
                   ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RelatorioDetailPage(relatorio: r),
+                      ),
+                    );
+                  },
                 );
               },
             );
-          } else if (state is RelatorioErro) {
-            return Center(child: Text(state.mensagem));
           }
-
           return const SizedBox();
         },
       ),
       floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
         onPressed: () {
           Navigator.push(
             context,
@@ -89,7 +103,6 @@ class _RelatorioListPageState extends State<RelatorioListPage> {
             ),
           );
         },
-        child: const Icon(Icons.add),
       ),
     );
   }

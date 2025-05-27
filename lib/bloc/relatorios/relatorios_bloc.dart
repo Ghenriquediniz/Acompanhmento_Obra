@@ -1,35 +1,32 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import './relatorios_event.dart';
-import 'relatorios_state.dart';
+import '../relatorios/relatorios_event.dart';
+import '../relatorios/relatorios_state.dart';
 import '../../models/relatorio_model.dart';
 
 class RelatorioBloc extends Bloc<RelatorioEvent, RelatorioState> {
   final List<Relatorio> _relatorios = [];
 
   RelatorioBloc() : super(RelatorioInicial()) {
-    on<CarregarRelatorios>(_onCarregarRelatorios);
-    on<AdicionarRelatorio>(_onAdicionarRelatorio);
-  }
+    on<CarregarRelatorios>((event, emit) {
+      emit(RelatorioCarregando());
+      final rels = _relatorios.where((r) => r.obraId == event.obraId).toList();
+      emit(RelatorioCarregado(rels));
+    });
 
-  void _onCarregarRelatorios(
-    CarregarRelatorios event,
-    Emitter<RelatorioState> emit,
-  ) async {
-    emit(RelatorioCarregando());
-    try {
-      // Aqui você pode buscar os relatórios de um repositório ou serviço
-      // Por enquanto, vamos simular com uma lista vazia
-      emit(RelatorioCarregado(_relatorios));
-    } catch (e) {
-      emit(RelatorioErro('Erro ao carregar relatórios'));
-    }
-  }
-
-  void _onAdicionarRelatorio(
-    AdicionarRelatorio event,
-    Emitter<RelatorioState> emit,
-  ) async {
-    _relatorios.add(event.relatorio);
-    emit(RelatorioCarregado(List.from(_relatorios)));
+    on<AdicionarRelatorio>((event, emit) {
+      _relatorios.add(event.relatorio);
+      final rels =
+          _relatorios.where((r) => r.obraId == event.relatorio.obraId).toList();
+      emit(RelatorioCarregado(rels));
+    });
+    on<EditarRelatorio>((event, emit) {
+      final index = _relatorios.indexWhere(
+        (r) => r.id == event.relatorioEditado.id,
+      );
+      if (index != -1) {
+        _relatorios[index] = event.relatorioEditado;
+        emit(RelatorioCarregado(List.from(_relatorios)));
+      }
+    });
   }
 }

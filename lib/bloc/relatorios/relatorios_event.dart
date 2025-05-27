@@ -25,3 +25,12 @@ class AdicionarRelatorio extends RelatorioEvent {
   @override
   List<Object?> get props => [relatorio];
 }
+
+class EditarRelatorio extends RelatorioEvent {
+  final Relatorio relatorioEditado;
+
+  const EditarRelatorio(this.relatorioEditado);
+
+  @override
+  List<Object?> get props => [relatorioEditado];
+}

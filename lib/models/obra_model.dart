@@ -5,6 +5,7 @@ class Obra {
   final String cidade;
   final String bairro;
   final String? imagemPath;
+  final List<String> fotosPaths;
 
   Obra({
     required this.id,
@@ -13,6 +14,7 @@ class Obra {
     required this.cidade,
     required this.bairro,
     this.imagemPath,
+    this.fotosPaths = const [],
   });
 
   // Para edição
@@ -23,6 +25,7 @@ class Obra {
     String? cidade,
     String? bairro,
     String? imagemPath,
+    List<String>? fotosPaths,
   }) {
     return Obra(
       id: id ?? this.id,
@@ -31,6 +34,7 @@ class Obra {
       cidade: cidade ?? this.cidade,
       bairro: bairro ?? this.bairro,
       imagemPath: imagemPath ?? this.imagemPath,
+      fotosPaths: fotosPaths ?? this.fotosPaths,
     );
   }
 }
